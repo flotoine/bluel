@@ -7,7 +7,7 @@ if (projets === null) {
     const valeurProjets =  JSON.stringify(projets); //créa fichier json et copie des données projets
     window.localStorage.setItem("projets", valeurProjets); //acceuil des projets dans local storage
 } else {
-    projets = JSON.parse(projets); //va chercher le projet ?
+    projets = JSON.parse(projets); // rend utilisable le JSON
 }
 
 
