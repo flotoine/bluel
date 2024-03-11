@@ -123,8 +123,34 @@ li:hover {
 }
 #portfolio h2 {
 	text-align: center;
-	margin-bottom: 1em;
+	margin-bottom: 1.5em;
 }
+
+.filtres {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 3em;
+}
+
+.filtre {
+	display: flex;
+	align-items: center;
+	font-family: 'Syne';
+	font-size: 1.2em;
+	color: #1D6154;
+	background-color: white;
+	border-radius: 60px ;
+	border: solid #1D6154 1px;
+	height: 40px;
+	padding: 0px 20px 0px 20px;
+	margin: 0px 10px 0px 10px;
+}
+
+.filtres:hover {
+	background-color: #1D6154;
+	color: white;
+}
+
 .gallery {
 	width: 100%;
 	display: grid;
@@ -179,6 +205,8 @@ input[type="submit"]{
 	text-align: center;
 	border-radius: 60px ;
 }
+
+
 
 footer nav ul {
 	display: flex;
