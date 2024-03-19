@@ -11,11 +11,13 @@ function adminIndex () {
     document.getElementsByTagName("head")[0].appendChild(editStyle) ;
     /// bouton modifier
     let mesProjets = document.querySelector("#portfolio > h2");
-    let modifier = document.createElement('p');
+    let modifier = document.createElement('a');
+    modifier.href = "#";
+    modifier.className = "modifierLink"
     mesProjets.appendChild(modifier);
     modifier.innerHTML = "<i class=\"fa-regular fa-pen-to-square\"></i>&nbspModifier";
     let modifierStyle = document.createElement ("style");
-    modifierStyle.innerHTML = "#portfolio p {font-size:14px; font-weight: 1; font-family: 'Work Sans' ; color: black; margin-left:3%} #portfolio h2 {display:flex; justify-content: center; align-items: center}"; 
+    modifierStyle.innerHTML = "#portfolio a {font-size:14px; font-weight: 1; font-family: 'Work Sans' ; color: black; margin-left:3%} #portfolio h2 {display:flex; justify-content: center; align-items: center}"; 
     document.getElementsByTagName("head")[0].appendChild(modifierStyle);
     
     /// option logout

@@ -89,6 +89,15 @@ h2{
 	font-size: 30px;
 	color: #1D6154
 }
+
+h3 {
+	font-size: 20px;
+	display: flex;
+	justify-content: center;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
 nav ul {
 	display: flex;
 	align-items: center;
@@ -186,7 +195,7 @@ margin: auto;
 	flex-direction: column;
 }
 
-#contact input, #login input {
+input {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
@@ -208,7 +217,7 @@ margin: auto;
 
 
 
-input[type="submit"]{
+input[type="submit"] {
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
@@ -230,5 +239,42 @@ footer nav ul {
 	display: flex;
 	justify-content: flex-end;
 	margin: 2em
+}
+
+.modal {
+	position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+	background: rgba(0, 0, 0, 0.8);
+}
+
+.modal-wrapper {
+	display:flex;
+	flex-direction: column;
+    width: 500px;
+	height: 600px;
+	padding: 30px;
+    background-color: #fff;
+	border-radius: 10px;
+}
+
+.modal-projetsEnsemble {
+	padding-left:30px;
+	padding-right:30px;
+}
+
+.modal-wrapper img {
+	height: 100px;
+	padding: 5px;
+}
+
+.navigationButtonsDiv a {
+	display: flex;
+	justify-content: right;
 }
 
