@@ -1,6 +1,6 @@
-const formConnexion = document.querySelector('form');
+const formConnection = document.querySelector('form');
 
-formConnexion.addEventListener("submit", function(event) {
+formConnection.addEventListener("submit", function(event) {
     event.preventDefault();
     fetchConnection();
 });
@@ -35,7 +35,6 @@ function connectionError () {
     errorMessage.innerHTML = "Erreur d'authentification"
     errorDisplay.appendChild(errorMessage)
 }
-
 
 
 
