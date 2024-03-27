@@ -248,14 +248,21 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
         let imageIconInInsert = document.createElement("i")
         imageIconInInsert.className = "fa-regular fa-image"
 
+        let browsePhoto = document.createElement ('input')
+        browsePhoto.setAttribute("type", "file")
+        browsePhoto.setAttribute("id", "browsePhoto")
+        browsePhoto.setAttribute("hidden", "")
+        browsePhoto.setAttribute("required", "")
         let addPhotoButton = document.createElement('input')
-        addPhotoButton.setAttribute("type","submit")
+        addPhotoButton.setAttribute("type","button")
+        addPhotoButton.setAttribute("id","addPhotoButton")
         addPhotoButton.setAttribute("value","+ Ajouter photo")
 
         let photoRequirementsText = document.createElement('p')
         photoRequirementsText.innerText = "jpg, png : 4mo max"
         
         uploadInsert.appendChild(imageIconInInsert)
+        uploadInsert.appendChild(browsePhoto)
         uploadInsert.appendChild(addPhotoButton)
         uploadInsert.appendChild(photoRequirementsText)
 
@@ -263,11 +270,11 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
 
                 /// ajout champ titre 
         let titleInputLabel = document.createElement("label");
-        titleInputLabel.setAttribute("for","titre");
+        titleInputLabel.setAttribute("for","title");
         titleInputLabel.innerText = "Titre"
         let titleInput = document.createElement("input");
-        titleInput.setAttribute("name","titre")
-        titleInput.setAttribute("id","titre")
+        titleInput.setAttribute("name","title")
+        titleInput.setAttribute("id","title")
         titleInput.setAttribute("required", "")
         titleInput.setAttribute("minlength","4")
         titleInput.setAttribute("maxlength","40")
@@ -279,7 +286,10 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
         let catSelectLabel = document.createElement("label");
         catSelectLabel.innerText = "Catégorie"
         let catSelect = document.createElement("select");
-        catSelect.innerHTML = "<option value=\"NA\"></option><option value=\"0\">Objets</option><option value=\"1\">Appartements</option><option value=\"2\">Hôtels & Restaurants</option>"
+        catSelect.setAttribute("name","category")
+        catSelect.setAttribute("id","category")
+        catSelect.setAttribute("required", "")
+        catSelect.innerHTML = "<option value=\"\">Choisissez une catégorie</option><option value=\"1\">Objets</option><option value=\"2\">Appartements</option><option value=\"3\">Hôtels & Restaurants</option>"
         uploadForm.appendChild(catSelectLabel)
         uploadForm.appendChild(catSelect)
 
@@ -293,6 +303,51 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
 
         let modalWrapper = document.querySelector(".modal-wrapper")
         modalWrapper.appendChild(uploadForm)
+
+
+        /// fonction ajouter photo
+        document.getElementById('addPhotoButton').addEventListener('click', openDialog);
+
+        function openDialog() { /// ouvre boite de dialogue
+            document.getElementById('browsePhoto').click();
+        }
+
+
+        browsePhoto.addEventListener('change', function () { //écoute l'ajout d'une photo
+            let reader = new FileReader()
+            reader.readAsBinaryString(browsePhoto.files[0])
+            reader.onload = function () {
+                window.localStorage.setItem('newProjectPhoto', reader.result)  ///donne photo et met dans le local storage
+                imageIconInInsert.style = "display:none"
+                addPhotoButton.style = "display:none"
+                photoRequirementsText.style = "display:none"
+                let projectImageInInsert = document.createElement('img')
+                projectImageInInsert.className = 'projectImageInInsert'
+                projectImageInInsert.src = 'data:image/jpeg;base64,' + btoa(reader.result);
+                uploadInsert.appendChild(projectImageInInsert) // affiche photo dans l'encart
+                browsePhoto.setAttribute("filename",browsePhoto.files[0].name)
+            }
+        })
+
+
+        uploadForm.onsubmit = function (e) {  //function quand form soumis
+            e.preventDefault()
+            let formData = new FormData (uploadForm)
+            formData.append("image", browsePhoto.files[0])
+
+            async function sendNewWork () {
+                const response = await fetch('http://localhost:5678/api/works', {
+                    method: 'POST',
+                    headers: {
+                        "Authorization" : `Bearer ${token}`},
+                    body: formData,
+                })    
+                
+                }
+               sendNewWork() 
+            }
+                
+
         
 
 
@@ -302,7 +357,6 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
     }
     
 }
-
 
 
 
