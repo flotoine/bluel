@@ -1,15 +1,20 @@
 //\1/\\ COMMANDES DE L'OUTIL MODIFICATION
+
 let modal = document.querySelector(".modal");
 modal.style = "display:none";
 let modalGallery = document.querySelector(".modal-wrapper"); 
+const button0 = document.querySelector("#button-all");
+const button1 = document.querySelector("#button-objects");
+const button2 = document.querySelector("#button-flats");
+const button3 = document.querySelector("#button-hotels");
+let category = 0;
+
+
+/// ajoute bandeau mode d'édition pour l'admin + bouton modifier si un token est stocké
 let token = window.localStorage.getItem ("token");
-if (token !== null) {adminIndex()}
+if (token !== null) {adminIndex()} 
 
-
-
-
-/// ajoute bandeau mode d'édition pour l'admin + bouton modifier
-function adminIndex () {
+function adminIndex () {  ///Lorsque qu'un token est stocké
     /// édition bandeau supérieur
     let body = document.querySelector("body"); 
     let editMenu = document.createElement("div");
@@ -19,6 +24,7 @@ function adminIndex () {
     let editStyle = document.createElement("style") ;
     editStyle.innerHTML = '.editMenu {display: flex; justify-content:center; align-items:center; background-color:black; color:white; height:40px; width: 100vw; position: fixed; top: 0px;left: calc(-50vw + 50%);}' ;
     document.getElementsByTagName("head")[0].appendChild(editStyle);
+    
     /// bouton modifier
     let myProjects = document.querySelector("#portfolio > h2");
     let editLink = document.createElement('a'); //bouton modifier
@@ -29,10 +35,10 @@ function adminIndex () {
     let editLinkStyle = document.createElement ("style");
     editLinkStyle.innerHTML = "#portfolio a {font-size:14px; font-weight: 1; font-family: 'Work Sans' ; color: black; margin-left:3%} #portfolio h2 {display:flex; justify-content: center; align-items: center}"; 
     document.getElementsByTagName("head")[0].appendChild(editLinkStyle);
-    
+    ///listener du bouton modifier
     editLink.addEventListener("click", function () {
-        modal.style = null;
-        galleryModalDisplay(projects);
+        modal.style = null; //retire le display:none de la modal au clic
+        galleryModalDisplay(projects); //lance génération de la première fenêtre modale
 
     })
 
@@ -43,10 +49,12 @@ function adminIndex () {
     /// option logout
     let login = document.getElementById("login");
     login.innerHTML = "logout";
-    login.addEventListener("click", function (event) {
+    
+    login.addEventListener("click", function (event) { ///écoute clic sur logout
         event.preventDefault();
         window.localStorage.clear('token'); // retire token du local storage
-        login.innerHTML = "login"; //re-MAJ du bouton
+        window.localStorage.removeItem ('projects') //permet actualisation des projets
+        login.innerHTML = "login"; //re-MAJ du bouton login/logout
         window.location.href = "./index.html" //ça et preventDefault pour rester sur la page projects
     });
 }
@@ -66,7 +74,8 @@ if (projects === null) {
 }
 
 
-function displayProject (projects) {   //gérération générale (sans monSet)
+function displayProject (projects) { 
+    button0.focus({focusVisible : false}); //gérération générale (sans monSet) --- Ajouter un ::active sur TOUS par défaut
     for (let i = 0; i< projects.length; i++) {
         let gallery = document.querySelector(".gallery");
     // récupération galerie project dans DOM
@@ -76,6 +85,7 @@ function displayProject (projects) {   //gérération générale (sans monSet)
         let project = projects[i];
         let imageElement = document.createElement("img");
         imageElement.src = project.imageUrl;
+        imageElement.alt = `Image du projet ${project.title}`
         let titleElement = document.createElement("figcaption")
         titleElement.innerText = project.title;
 
@@ -86,21 +96,14 @@ function displayProject (projects) {   //gérération générale (sans monSet)
     }
 }
 
-displayProject (projects);
+displayProject (projects); // fonction par défaut à l'ouverture de la page
 
 /////// Boutons au clic 
-
-const button0 = document.querySelector("#button-all");
-const button1 = document.querySelector("#button-objects");
-const button2 = document.querySelector("#button-flats");
-const button3 = document.querySelector("#button-hotels");
-
-let category = 0;
 
 button0.addEventListener("click", function() {  //bouton Tous
     let gallery = document.querySelector(".gallery");
     gallery.innerHTML = "";
-    displayProject (projects)
+    displayProject (projects) 
 });
 
 button1.addEventListener("click", function() {  //Bouton Objets
@@ -128,7 +131,7 @@ button3.addEventListener("click", function() { //Bouton Hotels
  /// sélection de la catégorie d'objet
 let monSet = new Set();
 
-let setProjects = function (projects, category) {
+let setProjects = function (projects, category) { //ajoute les objets correspond à la catégorie dans un set
     monSet.clear(); // vide le set sinon les autres catégories restent après un deuxième choix
     for (let i = 0 ; i< projects.length;i++){
         if (projects[i].categoryId === category) {
@@ -147,6 +150,7 @@ function generateFromSet () {  //generation à partir de monSet
         let project = projects[i];
         let imageElement = document.createElement("img");
         imageElement.src = project.imageUrl;
+        imageElement.alt = `Image du projet ${project.title}`
         let titleElement = document.createElement("figcaption")
         titleElement.innerText = project.title;
 
@@ -193,26 +197,66 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
     let projectsDiv = document.createElement("div");
     projectsDiv.className = "modal-projects"
     modalGallery.appendChild(projectsDiv)
+    
     for (let i = 0; i< projects.length; i++) {
     // récupération galerie project dans DOM
         
     //création élément
-        let project = projects[i];
+        let project = projects[i];  ///i=élément dans la boucle /// .id=élément à supprimer le cas échéant
         let imageAndTrash = document.createElement("div")
         imageAndTrash.className = "imageAndTrash"
         let imageElement = document.createElement("img");
         imageElement.src = project.imageUrl;
-        let trashIcon = document.createElement("i");
+        imageElement.id = `modal-photoFromProjectId-${projects[i].id}`
+        let trashIcon = document.createElement("i"); /// création poubelle
         trashIcon.className = "fa-solid fa-trash-can";
-
-    /// création poubelle
+        trashIcon.id = `modal-trashForProjectId-${projects[i].id}` ///TEMPORAIRE
+    
     /// idée créer une div (backgrn noir) et dedans la poubelle <i class="fa-solid fa-trash-can"></i>, la fixer et lui attribuer une class en function de l'ID project
 
 //rattachement des éléments dans DOM
-    projectsDiv.appendChild(imageAndTrash);
+        projectsDiv.appendChild(imageAndTrash);
         imageAndTrash.appendChild(imageElement);
         imageAndTrash.appendChild(trashIcon);
     }
+
+/// Fonction supprimer dans la base de données
+    async function deleteProject (idToDelete) {
+    const response = await fetch(`http://localhost:5678/api/works/${idToDelete}`, {   ///replacer à la fin par ${id}
+        method: 'DELETE',
+        headers: {
+            "Authorization" : `Bearer ${token}`},
+    })    
+    
+    }
+
+    const deleteProjectPageReload = async (idToDelete) => {
+        const result = await deleteProject(idToDelete)
+        window.localStorage.removeItem ('projects') //permet actualisation des projets
+        location.reload()
+    } 
+
+
+    let toTrash = document.querySelectorAll(`.fa-trash-can`)  ///sélection les poubelles
+    toTrash.forEach (trash => trash.addEventListener("click", function () {
+        let idToDelete = parseInt(trash.id.replace("modal-trashForProjectId-","")) ///retourne id liée au projet 
+        if (confirm (`Voulez-vous vraiment supprimer le projet ${idToDelete} ?`)) 
+        {
+            deleteProjectPageReload(idToDelete);
+        } 
+    }))
+
+   
+
+    
+
+    
+
+
+
+
+
+
 
     ///génération bouton ajouter 
     let addButton = document.createElement("input");
@@ -221,7 +265,7 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
     modalGallery.appendChild(addButton);
 
     const ajouterUnePhotoButton = document.querySelector('input[value="Ajouter une photo"]')
-    ajouterUnePhotoButton.addEventListener("click", addPhotoDisplay)
+    ajouterUnePhotoButton.addEventListener("click", addPhotoDisplay) // lance 2e page lors du clic "ajouter une photo"
 
     function addPhotoDisplay () {
         ///
@@ -236,7 +280,7 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
         // supprime bouton du bas
         addButton.remove();
         
-        
+        /// génération du formulaire
         let uploadForm = document.createElement("form")
         uploadForm.className = "uploadForm"
 
@@ -248,15 +292,16 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
         let imageIconInInsert = document.createElement("i")
         imageIconInInsert.className = "fa-regular fa-image"
 
-        let browsePhoto = document.createElement ('input')
+        let browsePhoto = document.createElement ('input') //crée un input file caché
         browsePhoto.setAttribute("type", "file")
         browsePhoto.setAttribute("id", "browsePhoto")
         browsePhoto.setAttribute("hidden", "")
         browsePhoto.setAttribute("required", "")
-        let addPhotoButton = document.createElement('input')
+        browsePhoto.setAttribute("accept","image/png, image/jpeg")
+        let addPhotoButton = document.createElement('input') //crée le bouton pour ajouter le file (image)
         addPhotoButton.setAttribute("type","button")
         addPhotoButton.setAttribute("id","addPhotoButton")
-        addPhotoButton.setAttribute("value","+ Ajouter photo")
+        addPhotoButton.setAttribute("value","+ Ajouter photo") 
 
         let photoRequirementsText = document.createElement('p')
         photoRequirementsText.innerText = "jpg, png : 4mo max"
@@ -299,6 +344,7 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
         let formValidationButton = document.createElement('input')
         formValidationButton.setAttribute("type","submit")
         formValidationButton.setAttribute("value","Valider")
+        formValidationButton.setAttribute("id","formValidationButton")
         uploadForm.appendChild(formValidationButton)
 
         let modalWrapper = document.querySelector(".modal-wrapper")
@@ -315,7 +361,8 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
 
         browsePhoto.addEventListener('change', function () { //écoute l'ajout d'une photo
             let reader = new FileReader()
-            reader.readAsBinaryString(browsePhoto.files[0])
+            reader.readAsBinaryString(browsePhoto.files[0]) //transforme la forme en chaine binaire (requis par l'API)
+            if(browsePhoto.files[0].size<4194304) {  ///contrôle de la taille du fichier
             reader.onload = function () {
                 window.localStorage.setItem('newProjectPhoto', reader.result)  ///donne photo et met dans le local storage
                 imageIconInInsert.style = "display:none"
@@ -327,12 +374,28 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
                 uploadInsert.appendChild(projectImageInInsert) // affiche photo dans l'encart
                 browsePhoto.setAttribute("filename",browsePhoto.files[0].name)
             }
+            } else { 
+                alert("Veuillez choisir une image moins volumineuse (4 méga-octets maximum)")
+            }
         })
 
+        ///Message si image absente
+        formValidationButton.addEventListener("click", function() {
+            if(browsePhoto.validity.valueMissing) {
+                alert("Veuillez ajouter une photo")
+            }
+        })
 
+        uploadForm.addEventListener("change", function() {
+            if((uploadForm[0].validity.valueMissing)===false && (uploadForm[2].validity.valueMissing)===false && (uploadForm[3].validity.valueMissing)===false) {
+                formValidationButton.style = "background-color:#1D6154"
+            }
+            else (formValidationButton.style = "background-color:rgb(157,157,157)");
+        })
+        
         uploadForm.onsubmit = function (e) {  //function quand form soumis
             e.preventDefault()
-            let formData = new FormData (uploadForm)
+            let formData = new FormData (uploadForm) //formdata ne prend que titre et catégorie dans ce cas
             formData.append("image", browsePhoto.files[0])
 
             async function sendNewWork () {
@@ -344,10 +407,18 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
                 })    
                 
                 }
-               sendNewWork() 
-            }
-                
 
+            const addProjectPageReload = async () => {
+                const result = await sendNewWork()
+                window.localStorage.removeItem ('projects') //permet actualisation des projets
+                location.reload()
+            } 
+
+            addProjectPageReload();
+                
+            }
+                /// il faudrait fermer la fenetre modale et actualiser la page avec projet ajouté
+             
         
 
 
