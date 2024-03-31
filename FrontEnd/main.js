@@ -38,6 +38,7 @@ function adminIndex () {  ///Lorsque qu'un token est stocké
     ///listener du bouton modifier
     editLink.addEventListener("click", function () {
         modal.style = null; //retire le display:none de la modal au clic
+        projects = JSON.parse(window.localStorage.getItem("projects"))
         galleryModalDisplay(projects); //lance génération de la première fenêtre modale
 
     })
@@ -167,6 +168,8 @@ function generateFromSet () {  //generation à partir de monSet
 
 function galleryModalDisplay (projects) {   // génération fenêtre modale
     // génération interface supérieure 
+    let modalWrapper = document.querySelector(".modal-wrapper")
+    modalWrapper.innerHTML = ""
     let navButtonsDiv = document.createElement('div');
     navButtonsDiv.className = "navigationButtonsDiv";
     navButtonsDiv.style = "justify-content:right";
@@ -231,9 +234,17 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
     }
 
     const deleteProjectPageReload = async (idToDelete) => {
-        const result = await deleteProject(idToDelete)
-        window.localStorage.removeItem ('projects') //permet actualisation des projets
-        location.reload()
+        window.localStorage.removeItem ('projects')
+        const result = await deleteProject(idToDelete) 
+
+        modal.style = "display:none"
+        const reponse = await fetch('http://localhost:5678/api/works'); //si rien dans le local storage, recherche des projets via API
+        projects = await reponse.json(); //extension JSON des données
+        const projectsValue =  JSON.stringify(projects); //créa fichier json et copie des données projets
+        window.localStorage.setItem("projects", projectsValue);
+        let gallery = document.querySelector(".gallery");
+        gallery.innerHTML = "";
+        displayProject(projects)
     } 
 
 
@@ -243,6 +254,7 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
         if (confirm (`Voulez-vous vraiment supprimer le projet ${idToDelete} ?`)) 
         {
             deleteProjectPageReload(idToDelete);
+
         } 
     }))
 
@@ -362,7 +374,7 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
         browsePhoto.addEventListener('change', function () { //écoute l'ajout d'une photo
             let reader = new FileReader()
             reader.readAsBinaryString(browsePhoto.files[0]) //transforme la forme en chaine binaire (requis par l'API)
-            if(browsePhoto.files[0].size<4194304) {  ///contrôle de la taille du fichier
+            if(browsePhoto.files[0].size<4194304) {  ///contrôle de la taille du fichier  -- met une constance à la place d'un gros chiffre dans ton code 
             reader.onload = function () {
                 window.localStorage.setItem('newProjectPhoto', reader.result)  ///donne photo et met dans le local storage
                 imageIconInInsert.style = "display:none"
@@ -395,6 +407,7 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
         
         uploadForm.onsubmit = function (e) {  //function quand form soumis
             e.preventDefault()
+            window.localStorage.removeItem ('projects') //permet actualisation des projets
             let formData = new FormData (uploadForm) //formdata ne prend que titre et catégorie dans ce cas
             formData.append("image", browsePhoto.files[0])
 
@@ -410,8 +423,16 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
 
             const addProjectPageReload = async () => {
                 const result = await sendNewWork()
-                window.localStorage.removeItem ('projects') //permet actualisation des projets
-                location.reload()
+                modal.style = "display:none"
+                const reponse = await fetch('http://localhost:5678/api/works'); //si rien dans le local storage, recherche des projets via API
+                projects = await reponse.json(); //extension JSON des données
+    
+                const projectsValue =  JSON.stringify(projects); //créa fichier json et copie des données projets
+                window.localStorage.setItem("projects", projectsValue);
+                let gallery = document.querySelector(".gallery");
+                gallery.innerHTML = "";
+                displayProject(projects)
+                
             } 
 
             addProjectPageReload();
