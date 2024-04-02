@@ -225,11 +225,16 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
 
 /// Fonction supprimer dans la base de données
     async function deleteProject (idToDelete) {
-    const response = await fetch(`http://localhost:5678/api/works/${idToDelete}`, {   ///replacer à la fin par ${id}
+    const response = await fetch(`http://localhost:5678/api/works/${idToDelete}`, {   
         method: 'DELETE',
         headers: {
             "Authorization" : `Bearer ${token}`},
-    })    
+    })
+    if (response.status !== 204) {
+        alert("Une erreur a été rencontrée. Veuillez vous reconnecter")
+        window.localStorage.removeItem('token')
+        location.reload()
+    }    
     
     }
 
@@ -370,11 +375,11 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
             document.getElementById('browsePhoto').click();
         }
 
-
+        const maxFileSize = 4194304
         browsePhoto.addEventListener('change', function () { //écoute l'ajout d'une photo
             let reader = new FileReader()
             reader.readAsBinaryString(browsePhoto.files[0]) //transforme la forme en chaine binaire (requis par l'API)
-            if(browsePhoto.files[0].size<4194304) {  ///contrôle de la taille du fichier  -- met une constance à la place d'un gros chiffre dans ton code 
+            if(browsePhoto.files[0].size<maxFileSize) {  ///contrôle de la taille du fichier  -- met une constance à la place d'un gros chiffre dans ton code 
             reader.onload = function () {
                 window.localStorage.setItem('newProjectPhoto', reader.result)  ///donne photo et met dans le local storage
                 imageIconInInsert.style = "display:none"
@@ -417,7 +422,12 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
                     headers: {
                         "Authorization" : `Bearer ${token}`},
                     body: formData,
-                })    
+                })
+                if (response.status !== 201) {
+                    alert("Une erreur a été rencontrée. Veuillez vous reconnecter")
+                    window.localStorage.removeItem('token')
+                    location.reload()
+                }
                 
                 }
 
@@ -438,7 +448,7 @@ function galleryModalDisplay (projects) {   // génération fenêtre modale
             addProjectPageReload();
                 
             }
-                /// il faudrait fermer la fenetre modale et actualiser la page avec projet ajouté
+               
              
         
 

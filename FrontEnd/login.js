@@ -21,8 +21,7 @@ async function fetchConnection () {
     if (response.ok) {  // plus de détail dans response.status (200, 401, 404)
         let token = (await response.json()).token; ///extraction du token
         window.localStorage.setItem("token", token);
-        window.location.href = "./index.html" // à conditionner à la connexion utilisatrice
-        console.log(token)
+        window.location.href = "./index.html" 
     } else {
         connectionError();
     }
