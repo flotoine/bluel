@@ -4,9 +4,7 @@ let modal = document.querySelector(".modal");
 modal.style = "display:none";
 let modalGallery = document.querySelector(".modal-wrapper"); 
 const button0 = document.querySelector("#button-all");
-const button1 = document.querySelector("#button-objects");
-const button2 = document.querySelector("#button-flats");
-const button3 = document.querySelector("#button-hotels");
+
 let category = 0;
 
 
@@ -19,7 +17,7 @@ function adminIndex () {  ///Lorsque qu'un token est stocké
     let body = document.querySelector("body"); 
     let editMenu = document.createElement("div");
     editMenu.className = "editMenu"
-    editMenu.innerHTML = "<i class=\"fa-regular fa-pen-to-square\"></i>&nbspMode édition"
+    editMenu.innerHTML = `<i class="fa-regular fa-pen-to-square"></i>&nbspMode édition`
     body.insertBefore(editMenu, body.children[0])
     let editStyle = document.createElement("style") ;
     editStyle.innerHTML = '.editMenu {display: flex; justify-content:center; align-items:center; background-color:black; color:white; height:40px; width: 100vw; position: fixed; top: 0px;left: calc(-50vw + 50%);}' ;
@@ -60,7 +58,85 @@ function adminIndex () {  ///Lorsque qu'un token est stocké
     });
 }
 
-//\2/\\ COMMANDES DE L'OUTIL GÉNÉRATION DES PROJETS
+//\2/\\ COMMANDES DE L'OUTIL GÉNÉRATION DU SITE
+
+//2A\\ GENERATION DES FILTRES
+let categories = window.localStorage.getItem('categories')
+
+if (categories === null) {
+    const response = await fetch('http://localhost:5678/api/categories')  /// Cherche les catégories
+    categories = await response.json()
+
+    const categoriesValue = JSON.stringify(categories)
+    window.localStorage.setItem('categories', categoriesValue)  //les stocke
+} else {
+    categories = JSON.parse(categories)
+}
+
+function filtersDisplay(categories) { 
+    let filters = document.querySelector(".filters")
+
+    for(let i = 0; i < categories.length; i++) {  // boucle de génération des filtres selon les catégories du local storage (donc sauf "Tous")
+        let button = document.createElement('button')
+        button.id = `button${categories[i].id}`
+        button.className = ('filter')
+        button.innerText = categories[i].name
+
+        let category = categories[i].id
+        button.addEventListener("click", function () {  /// écoute chaque bouton
+            setProjects(projects,category)  //crée set correspondant à la catégories
+            generateFromSet ()}  //génération dans DOM
+            )
+        filters.appendChild(button)
+    }
+}
+
+filtersDisplay(categories) //affichage des filtres
+
+/////// Boutons au clic 
+
+button0.addEventListener("click", function() {  //bouton Tous
+    let gallery = document.querySelector(".gallery");
+    gallery.innerHTML = "";
+    displayProject (projects) 
+});
+
+ /// sélection de la catégorie d'objet
+let monSet = new Set();
+
+let setProjects = function (projects, category) { //ajoute les objets correspond à la catégorie dans un set
+    monSet.clear(); // vide le set sinon les autres catégories restent après un deuxième choix
+    for (let i = 0 ; i< projects.length;i++){
+        if (projects[i].categoryId === category) {
+               monSet.add(i);}
+    }
+};
+
+function generateFromSet () {  //generation à partir de monSet
+    let gallery = document.querySelector(".gallery");
+    gallery.innerHTML = "";
+    monSet.forEach(function (value) {  /// sortir chaque valeur du set
+    let i = value;
+    let projectElement = document.createElement("figure");
+    
+    //création élément
+        let project = projects[i];
+        let imageElement = document.createElement("img");
+        imageElement.src = project.imageUrl;
+        imageElement.alt = `Image du projet ${project.title}`
+        let titleElement = document.createElement("figcaption")
+        titleElement.innerText = project.title;
+
+//rattachement des éléments dans DOM
+        gallery.appendChild(projectElement);
+        projectElement.appendChild(imageElement);
+        projectElement.appendChild(titleElement); 
+        
+  });
+}
+
+
+//2B\\ GENERATION DES PROJETS
 
 let projects = window.localStorage.getItem ('projects'); //définition des projets dans le local storage
 
@@ -99,69 +175,7 @@ function displayProject (projects) {
 
 displayProject (projects); // fonction par défaut à l'ouverture de la page
 
-/////// Boutons au clic 
 
-button0.addEventListener("click", function() {  //bouton Tous
-    let gallery = document.querySelector(".gallery");
-    gallery.innerHTML = "";
-    displayProject (projects) 
-});
-
-button1.addEventListener("click", function() {  //Bouton Objets
-    category = 1;
-    setProjects (projects, category);
-    generateFromSet (); 
-}); 
-
-button2.addEventListener("click", function() { //Bouton Apparts
-    category = 2;
-    setProjects (projects, category);
-    generateFromSet (); 
-}
-); 
-
-button3.addEventListener("click", function() { //Bouton Hotels
-    category = 3;
-    setProjects (projects, category);
-    generateFromSet (); 
-}); 
-
-
-
-
- /// sélection de la catégorie d'objet
-let monSet = new Set();
-
-let setProjects = function (projects, category) { //ajoute les objets correspond à la catégorie dans un set
-    monSet.clear(); // vide le set sinon les autres catégories restent après un deuxième choix
-    for (let i = 0 ; i< projects.length;i++){
-        if (projects[i].categoryId === category) {
-               monSet.add(i);}
-    }
-};
-
-function generateFromSet () {  //generation à partir de monSet
-    let gallery = document.querySelector(".gallery");
-    gallery.innerHTML = "";
-    monSet.forEach(function (value) {  /// sortir chaque valeur du set
-    let i = value;
-    let projectElement = document.createElement("figure");
-    
-    //création élément
-        let project = projects[i];
-        let imageElement = document.createElement("img");
-        imageElement.src = project.imageUrl;
-        imageElement.alt = `Image du projet ${project.title}`
-        let titleElement = document.createElement("figcaption")
-        titleElement.innerText = project.title;
-
-//rattachement des éléments dans DOM
-        gallery.appendChild(projectElement);
-        projectElement.appendChild(imageElement);
-        projectElement.appendChild(titleElement); 
-        
-  });
-}
 
 
 //\3/\\ COMMANDES DE L'OUTIL MODAL
